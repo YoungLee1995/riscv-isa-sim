@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct exp8_sig16 softfloat_normSubnormalF16Sig( uint_fast16_t sig )
 {
     int_fast8_t shiftDist;
-    struct exp8_sig16 z;
+    struct exp8_sig16 z; //定义一个结构体变量 z，包含一个 int_fast8_t 类型的 exp 和一个 uint_fast16_t 类型的 sig
 
-    shiftDist = softfloat_countLeadingZeros16( sig ) - 5;
-    z.exp = 1 - shiftDist;
-    z.sig = sig<<shiftDist;
+    shiftDist = softfloat_countLeadingZeros16( sig ) - 5; //计算 sig 的前导零位数
+    z.exp = 1 - shiftDist; //计算 z 的指数
+    z.sig = sig<<shiftDist; //计算 z 的尾数
     return z;
 
 }

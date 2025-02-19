@@ -45,7 +45,7 @@ float16_t
  softfloat_mulAddF16(
      uint_fast16_t uiA, uint_fast16_t uiB, uint_fast16_t uiC, uint_fast8_t op )
 {
-    bool signA;
+    bool signA; //解释：定义一个布尔型变量signA
     int_fast8_t expA;
     uint_fast16_t sigA;
     bool signB;
@@ -75,14 +75,14 @@ float16_t
     signB = signF16UI( uiB );
     expB  = expF16UI( uiB );
     sigB  = fracF16UI( uiB );
-    signC = signF16UI( uiC ) ^ (op == softfloat_mulAdd_subC);
+    signC = signF16UI( uiC ) ^ (op == softfloat_mulAdd_subC); //signC 的计算中考虑了 op 参数，如果 op 是 softfloat_mulAdd_subC，则对 C 的符号位取反。
     expC  = expF16UI( uiC );
     sigC  = fracF16UI( uiC );
-    signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
+    signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd); //signProd 的计算中考虑了 op 参数，如果 op 是 softfloat_mulAdd_subProd，则对 Prod 的符号位取反。
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( expA == 0x1F ) {
-        if ( sigA || ((expB == 0x1F) && sigB) ) goto propagateNaN_ABC;
+        if ( sigA || ((expB == 0x1F) && sigB) ) goto propagateNaN_ABC; //如果 A 是 NaN，或者 B 是 NaN 且 A 是非零值，则返回 NaN
         magBits = expB | sigB;
         goto infProdArg;
     }
@@ -101,11 +101,11 @@ float16_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
-        normExpSig = softfloat_normSubnormalF16Sig( sigA );
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
+    if ( ! expA ) { //如果 A 是非规格化数
+        if ( ! sigA ) goto zeroProd; //如果 A 是零值，则返回零值
+        normExpSig = softfloat_normSubnormalF16Sig( sigA ); //对 A 进行规格化
+        expA = normExpSig.exp; //更新 A 的指数
+        sigA = normExpSig.sig; //更新 A 的尾数
     }
     if ( ! expB ) {
         if ( ! sigB ) goto zeroProd;
@@ -115,42 +115,42 @@ float16_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    expProd = expA + expB - 0xE;
-    sigA = (sigA | 0x0400)<<4;
-    sigB = (sigB | 0x0400)<<4;
-    sigProd = (uint_fast32_t) sigA * sigB;
-    if ( sigProd < 0x20000000 ) {
-        --expProd;
-        sigProd <<= 1;
+    expProd = expA + expB - 0xE; //计算 Prod 的指数
+    sigA = (sigA | 0x0400)<<4; //将 A 的尾数左移 4 位
+    sigB = (sigB | 0x0400)<<4; //将 B 的尾数左移 4 位
+    sigProd = (uint_fast32_t) sigA * sigB; //计算 Prod 的尾数,用的是 32 位乘法
+    if ( sigProd < 0x20000000 ) { //如果 Prod 的尾数小于 0x20000000
+        --expProd; //更新 Prod 的指数
+        sigProd <<= 1; //将 Prod 的尾数左移 1 位
     }
-    signZ = signProd;
-    if ( ! expC ) {
+    signZ = signProd; //更新 Z 的符号位
+    if ( ! expC ) { //如果 C 是非规格化数
         if ( ! sigC ) {
-            expZ = expProd - 1;
-            sigZ = sigProd>>15 | ((sigProd & 0x7FFF) != 0);
+            expZ = expProd - 1; //更新 Z 的指数
+            sigZ = sigProd>>15 | ((sigProd & 0x7FFF) != 0); //更新 Z 的尾数
             goto roundPack;
         }
-        normExpSig = softfloat_normSubnormalF16Sig( sigC );
+        normExpSig = softfloat_normSubnormalF16Sig( sigC ); //对 C 进行规格化
         expC = normExpSig.exp;
         sigC = normExpSig.sig;
     }
-    sigC = (sigC | 0x0400)<<3;
+    sigC = (sigC | 0x0400)<<3; //将 C 的尾数左移 3 位
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    expDiff = expProd - expC;
-    if ( signProd == signC ) {
+    expDiff = expProd - expC; //计算 Prod 和 C 的指数之差
+    if ( signProd == signC ) { //如果 Prod 和 C 的符号位相同
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        if ( expDiff <= 0 ) { //如果 Prod的指数 <= C 的指数
             expZ = expC;
-            sigZ = sigC + softfloat_shiftRightJam32( sigProd, 16 - expDiff );
+            sigZ = sigC + softfloat_shiftRightJam32( sigProd, 16 - expDiff ); //计算 Z 的尾数
         } else {
             expZ = expProd;
             sig32Z =
                 sigProd
                     + softfloat_shiftRightJam32(
-                          (uint_fast32_t) sigC<<16, expDiff );
-            sigZ = sig32Z>>16 | ((sig32Z & 0xFFFF) != 0 );
+                          (uint_fast32_t) sigC<<16, expDiff ); //计算 Z 的尾数
+            sigZ = sig32Z>>16 | ((sig32Z & 0xFFFF) != 0 ); //更新 Z 的尾数
         }
         if ( sigZ < 0x4000 ) {
             --expZ;
@@ -159,11 +159,11 @@ float16_t
     } else {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        sig32C = (uint_fast32_t) sigC<<16;
+        sig32C = (uint_fast32_t) sigC<<16; //将 C 的尾数左移 16 位
         if ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
-            sig32Z = sig32C - softfloat_shiftRightJam32( sigProd, -expDiff );
+            sig32Z = sig32C - softfloat_shiftRightJam32( sigProd, -expDiff ); //计算 Z 的尾数
         } else if ( ! expDiff ) {
             expZ = expProd;
             sig32Z = sigProd - sig32C;
@@ -182,21 +182,21 @@ float16_t
         if ( shiftDist < 0 ) {
             sigZ =
                 sig32Z>>(-shiftDist)
-                    | ((uint32_t) (sig32Z<<(shiftDist & 31)) != 0);
+                    | ((uint32_t) (sig32Z<<(shiftDist & 31)) != 0); 
         } else {
             sigZ = (uint_fast16_t) sig32Z<<shiftDist;
         }
     }
- roundPack:
+ roundPack: //对 Z 进行舍入
     return softfloat_roundPackToF16( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- propagateNaN_ABC:
+ propagateNaN_ABC: //返回 NaN
     uiZ = softfloat_propagateNaNF16UI( uiA, uiB );
     goto propagateNaN_ZC;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- infProdArg:
+ infProdArg: //返回无穷大
     if ( magBits ) {
         uiZ = packToF16UI( signProd, 0x1F, 0 );
         if ( expC != 0x1F ) goto uiZ;
@@ -205,15 +205,15 @@ float16_t
     }
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ = defaultNaNF16UI;
- propagateNaN_ZC:
+ propagateNaN_ZC: //返回 NaN
     uiZ = softfloat_propagateNaNF16UI( uiZ, uiC );
     goto uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- zeroProd:
+ zeroProd: //返回零值
     uiZ = uiC;
     if ( ! (expC | sigC) && (signProd != signC) ) {
- completeCancellation:
+ completeCancellation: //返回零值
         uiZ =
             packToF16UI(
                 (softfloat_roundingMode == softfloat_round_min), 0, 0 );

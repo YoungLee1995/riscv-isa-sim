@@ -84,10 +84,10 @@ int_fast64_t softfloat_roundMToI64( bool, uint32_t *, uint_fast8_t, bool );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-#define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
-#define expF16UI( a ) ((int_fast8_t) ((a)>>10) & 0x1F)
-#define fracF16UI( a ) ((a) & 0x03FF)
-#define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
+#define signF16UI( a ) ((bool) ((uint16_t) (a)>>15)) //取出 16 位无符号整数表示的浮点数的符号位
+#define expF16UI( a ) ((int_fast8_t) ((a)>>10) & 0x1F) //取出 16 位无符号整数表示的浮点数的指数部分
+#define fracF16UI( a ) ((a) & 0x03FF) //取出 16 位无符号整数表示的浮点数的尾数部分
+#define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig)) //将符号位、指数部分和尾数部分合并成一个 16 位无符号整数表示的浮点数
 
 #define isNaNF16UI( a ) (((~(a) & 0x7C00) == 0) && ((a) & 0x03FF))
 

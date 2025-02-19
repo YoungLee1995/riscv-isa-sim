@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float16_t f16_add( float16_t a, float16_t b )
 {
-    union ui16_f16 uA;
+    union ui16_f16 uA; //将 float16_t 类型的浮点数与其对应的 16 位无符号整数表示进行相互转换。
     uint_fast16_t uiA;
     union ui16_f16 uB;
     uint_fast16_t uiB;
@@ -54,11 +54,11 @@ float16_t f16_add( float16_t a, float16_t b )
     uiA = uA.ui;
     uB.f = b;
     uiB = uB.ui;
-#if defined INLINE_LEVEL && (1 <= INLINE_LEVEL)
-    if ( signF16UI( uiA ^ uiB ) ) {
-        return softfloat_subMagsF16( uiA, uiB );
+#if defined INLINE_LEVEL && (1 <= INLINE_LEVEL) //判断是否需要内联
+    if ( signF16UI( uiA ^ uiB ) ) { //判断两个浮点数的符号是否相同
+        return softfloat_subMagsF16( uiA, uiB ); //如果两个浮点数的符号不同，则调用 softfloat_subMagsF16 函数进行浮点数的减法运算
     } else {
-        return softfloat_addMagsF16( uiA, uiB );
+        return softfloat_addMagsF16( uiA, uiB ); //如果两个浮点数的符号相同，则调用 softfloat_addMagsF16 函数进行浮点数的加法运算
     }
 #else
     magsFuncPtr =

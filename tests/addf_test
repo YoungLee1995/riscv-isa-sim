@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "softfloat.h"
+
+int main() {
+    // 示例输入：两个半精度浮点数
+    // 这里我们构造两个浮点数 uiA 和 uiB
+    bool signA = 0;       // 正号
+    uint_fast8_t expA = 10;  // 指数
+    uint_fast16_t sigA = 0x400; // 尾数（带隐含的 1）
+
+    bool signB = 0;       // 正号
+    uint_fast8_t expB = 9;   // 指数
+    uint_fast16_t sigB = 0x200; // 尾数（带隐含的 1）
+
+    // 构造 uiA 和 uiB
+    uint_fast16_t uiA = packToF16UI(signA, expA, sigA);
+    uint_fast16_t uiB = packToF16UI(signB, expB, sigB);
+
+    // 调用 softfloat_addMagsF16 方法
+    float result = softfloat_addMagsF16(uiA, uiB);
+
+    // 输出结果
+    printf("Result: %f\n", result);
+
+    return 0;
+}

@@ -52,38 +52,39 @@ float16_t
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    roundingMode = softfloat_roundingMode;
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    roundIncrement = 0x8;
+    roundingMode = softfloat_roundingMode; // 获取舍入模式
+    roundNearEven = (roundingMode == softfloat_round_near_even); // 判断是否为 round_near_even 模式
+    roundIncrement = 0x8; // 舍入增量
     if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? softfloat_round_min : softfloat_round_max))
                 ? 0xF
                 : 0;
-    }
-    roundBits = sig & 0xF;
+    } // 如果不是 round_near_even 模式，则根据舍入模式设置舍入增量
+    roundBits = sig & 0xF; // 取出尾数的低 4 位
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x1D <= (unsigned int) exp ) {
+    if ( 0x1D <= (unsigned int) exp ) { // 如果指数大于等于 29
         if ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
                 (softfloat_detectTininess == softfloat_tininess_beforeRounding)
-                    || (exp < -1) || (sig + roundIncrement < 0x8000);
-            sig = softfloat_shiftRightJam32( sig, -exp );
+                    || (exp < -1) || (sig + roundIncrement < 0x8000); // 判断是否为 tiny
+            sig = softfloat_shiftRightJam32( sig, -exp ); // 将尾数右移 exp 位
             exp = 0;
-            roundBits = sig & 0xF;
+            roundBits = sig & 0xF; // 取出尾数的低 4 位
             if ( isTiny && roundBits ) {
                 softfloat_raiseFlags( softfloat_flag_underflow );
-            }
-        } else if ( (0x1D < exp) || (0x8000 <= sig + roundIncrement) ) {
+            } // 如果是 tiny 并且尾数的低 4 位不为 0，则将 underflow 状态位置位
+        } 
+        else if ( (0x1D < exp) || (0x8000 <= sig + roundIncrement) ) { // 如果指数大于 29 或者尾数加上舍入增量大于等于 0x8000
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact );
-            uiZ = packToF16UI( sign, 0x1F, 0 ) - ! roundIncrement;
+                softfloat_flag_overflow | softfloat_flag_inexact ); // 将 overflow 和 inexact 状态位置位
+            uiZ = packToF16UI( sign, 0x1F, 0 ) - ! roundIncrement; // 将结果设置为无穷大
             goto uiZ;
         }
     }

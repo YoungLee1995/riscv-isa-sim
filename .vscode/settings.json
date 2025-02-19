@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "internals.h": "c",
+        "platform.h": "c",
+        "softfloat.h": "c",
+        "xlocmon": "c",
+        "f16_mul.c": "cpp",
+        "stdint.h": "c"
+    }
+}

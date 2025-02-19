@@ -1,0 +1,33 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build softfloat test",
+            "command": "C:\\Program Files\\w64devkit\\bin\\gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "softfloat/a_test.c",
+                "softfloat/*.c",
+                // "softfloat/s_normSubnormalF16Sig.c",
+                // "softfloat/s_roundPackToF16.c",
+                // "softfloat/s_propagateNaNF16UI.c",
+                // "softfloat/softfloat_raiseFlags.c",
+                "-o",
+                "softfloat/test.exe"          // 输出可执行文件路径
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"  // 设定工作目录为当前项目根目录
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Task to compile softfloat test program."
+        }
+    ],
+    "version": "2.0.0"
+}

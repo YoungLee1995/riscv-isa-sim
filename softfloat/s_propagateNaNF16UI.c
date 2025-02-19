@@ -49,8 +49,8 @@ uint_fast16_t
  softfloat_propagateNaNF16UI( uint_fast16_t uiA, uint_fast16_t uiB )
 {
 
-    if ( softfloat_isSigNaNF16UI( uiA ) || softfloat_isSigNaNF16UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if ( softfloat_isSigNaNF16UI( uiA ) || softfloat_isSigNaNF16UI( uiB ) ) { //判断 uiA 和 uiB 是否为 SNaN
+        softfloat_raiseFlags( softfloat_flag_invalid ); //如果 uiA 或 uiB 为 SNaN，则将 invalid 状态位置位
     }
     return defaultNaNF16UI;
 
